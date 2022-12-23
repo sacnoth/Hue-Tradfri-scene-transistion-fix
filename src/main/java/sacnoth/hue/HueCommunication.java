@@ -8,6 +8,8 @@ import sacnoth.network.JSONCommunication;
 
 import java.io.IOException;
 
+import static sacnoth.hue.Resources.toResources;
+
 @AllArgsConstructor
 @Log4j2
 public class HueCommunication {
@@ -15,7 +17,11 @@ public class HueCommunication {
     private final String bridgeIP;
     private final String apiKey;
 
-    public void fixScene(Scene scene, Resources<Light> lightsToFix) throws IOException {
+    public void fixScene(Scene scene, Resources<Light> tradfriLights) throws IOException {
+        Resources<Light> lightsToFix = tradfriLights.stream()
+                .filter(light -> scene.getLights().contains(light.id()))
+                .collect(toResources());
+
         log.info("Fixing lights {} in scene {}", lightsToFix, scene);
         JsonNode lightstates = JSONCommunication.get(getUrl("scenes/" + scene.id()))
                 .get("lightstates");

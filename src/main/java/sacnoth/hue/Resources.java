@@ -2,29 +2,26 @@ package sacnoth.hue;
 
 import lombok.experimental.Delegate;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collector;
+
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 
 public record Resources<T extends Identified>(
-        @Delegate(excludes = CollectionExclusions.class)
-        List<T> resources
-) implements Collection<T> {
-    @Override
-    public boolean contains(Object obj) {
-        if (Identified.class.isAssignableFrom(obj.getClass())) {
-            Identified identifiedObj = (Identified) obj;
-
-            return containsID(identifiedObj.id());
-        } else if (String.class.isAssignableFrom(obj.getClass())) {
-            String id = (String) obj;
-
-            return containsID(id);
-        } else {
-            return false;
-        }
+        @Delegate Set<T> resources
+) implements Iterable<T> {
+    public static <T extends Identified> Collector<T, Object, Resources<T>> toResources() {
+        return collectingAndThen(toUnmodifiableSet(), Resources::new);
     }
 
-    public boolean containsID(String id) {
+    public Set<String> ids() {
+        return resources.stream()
+                .map(Identified::id)
+                .collect(toUnmodifiableSet());
+    }
+
+    public boolean contains(String id) {
         return resources.stream()
                 .anyMatch(resource -> resource.id().equals(id));
     }
@@ -39,9 +36,5 @@ public record Resources<T extends Identified>(
     @Override
     public String toString() {
         return resources.toString();
-    }
-
-    private interface CollectionExclusions {
-        boolean contains(Object obj);
     }
 }

@@ -17,8 +17,7 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.disjoint;
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toUnmodifiableList;
+import static sacnoth.hue.Resources.toResources;
 
 @Log4j2
 public class HueTradfriFixer {
@@ -81,7 +80,7 @@ public class HueTradfriFixer {
                     .stream()
                     .filter(entry -> entry.getValue().getManufacturername().contains("IKEA"))
                     .map(light -> new Light(light.getKey(), light.getValue()))
-                    .collect(collectingAndThen(toUnmodifiableList(), Resources::new));
+                    .collect(toResources());
 
             log.info("Discovered TRÅDFRI lights: {}", tradfriLights);
 
@@ -89,9 +88,9 @@ public class HueTradfriFixer {
                     .getGroups()
                     .entrySet()
                     .stream()
-                    .filter(entry -> !disjoint(entry.getValue().getLights(), tradfriLights))
+                    .filter(entry -> !disjoint(entry.getValue().getLights(), tradfriLights.ids()))
                     .map(group -> new Group(group.getKey(), group.getValue()))
-                    .collect(collectingAndThen(toUnmodifiableList(), Resources::new));
+                    .collect(toResources());
 
             log.info("Groups containing TRÅDFRI lights: {}", tradfriGroups);
 
@@ -99,9 +98,9 @@ public class HueTradfriFixer {
                     .getScenes()
                     .entrySet()
                     .stream()
-                    .filter(entry -> tradfriGroups.containsID(entry.getValue().getGroup()))
+                    .filter(entry -> tradfriGroups.contains(entry.getValue().getGroup()))
                     .map(scene -> new Scene(scene.getKey(), tradfriGroups.get(scene.getValue().getGroup()).getName(), scene.getValue()))
-                    .collect(collectingAndThen(toUnmodifiableList(), Resources::new));
+                    .collect(toResources());
 
             log.info("Scenes containing TRÅDFRI lights: {}", tradfriScenes);
 
