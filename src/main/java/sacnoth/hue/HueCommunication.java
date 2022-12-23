@@ -7,7 +7,6 @@ import lombok.extern.log4j.Log4j2;
 import sacnoth.network.JSONCommunication;
 
 import java.io.IOException;
-import java.util.Collection;
 
 @AllArgsConstructor
 @Log4j2
@@ -16,16 +15,17 @@ public class HueCommunication {
     private final String bridgeIP;
     private final String apiKey;
 
-    public void fixScene(String sceneID, Collection<String> lightsToFix) throws IOException {
-        log.info("Fixing lights {} in scene {}", lightsToFix, sceneID);
-        JsonNode lightstates = JSONCommunication.get(getUrl("scenes/" + sceneID))
+    public void fixScene(Scene scene, Resources<Light> lightsToFix) throws IOException {
+        log.info("Fixing lights {} in scene {}", lightsToFix, scene);
+        JsonNode lightstates = JSONCommunication.get(getUrl("scenes/" + scene.id()))
                 .get("lightstates");
 
-        for (String lightToFix : lightsToFix) {
-            ObjectNode lightstate = (ObjectNode) lightstates.get(lightToFix);
+        for (Light lightToFix : lightsToFix) {
+            log.debug("Fixing light {} in scene {}", lightToFix, scene);
+            ObjectNode lightstate = (ObjectNode) lightstates.get(lightToFix.id());
             lightstate.put("transitiontime", 0);
 
-            writeLightstate(sceneID, lightToFix, lightstate);
+            writeLightstate(scene.id(), lightToFix.id(), lightstate);
         }
     }
 
