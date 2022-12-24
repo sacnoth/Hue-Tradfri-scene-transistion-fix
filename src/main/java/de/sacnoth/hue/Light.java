@@ -1,4 +1,4 @@
-package sacnoth.hue;
+package de.sacnoth.hue;
 
 import io.github.zeroone3010.yahueapi.domain.LightDto;
 import lombok.experimental.Delegate;

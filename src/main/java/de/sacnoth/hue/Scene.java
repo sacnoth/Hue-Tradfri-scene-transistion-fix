@@ -1,10 +1,11 @@
-package sacnoth.hue;
+package de.sacnoth.hue;
 
 import lombok.experimental.Delegate;
 
-public record Group(
+public record Scene(
         String id,
-        @Delegate io.github.zeroone3010.yahueapi.domain.Group group
+        String groupName,
+        @Delegate io.github.zeroone3010.yahueapi.domain.Scene scene
 ) implements Identified {
     @Override
     public boolean equals(Object o) {
@@ -15,8 +16,8 @@ public record Group(
             return false;
         }
 
-        Group group = (Group) o;
-        return id.equals(group.id);
+        Scene scene = (Scene) o;
+        return id.equals(scene.id);
     }
 
     @Override
@@ -26,6 +27,6 @@ public record Group(
 
     @Override
     public String toString() {
-        return getName();
+        return groupName() + "(" + getName() + ")";
     }
 }

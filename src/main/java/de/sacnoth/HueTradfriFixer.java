@@ -1,23 +1,21 @@
-package sacnoth;
+package de.sacnoth;
 
+import de.sacnoth.hue.Group;
+import de.sacnoth.hue.HueCommunication;
+import de.sacnoth.hue.Light;
+import de.sacnoth.hue.Resources;
+import de.sacnoth.hue.Scene;
 import io.github.zeroone3010.yahueapi.Hue;
 import io.github.zeroone3010.yahueapi.HueBridge;
 import io.github.zeroone3010.yahueapi.discovery.HueBridgeDiscoveryService;
 import lombok.extern.log4j.Log4j2;
-import sacnoth.hue.Group;
-import sacnoth.hue.HueCommunication;
-import sacnoth.hue.Light;
-import sacnoth.hue.Resources;
-import sacnoth.hue.Scene;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
-import static java.util.Collections.disjoint;
 import static java.util.Collections.emptyList;
-import static sacnoth.hue.Resources.toResources;
 
 @Log4j2
 public class HueTradfriFixer {
@@ -80,7 +78,7 @@ public class HueTradfriFixer {
                     .stream()
                     .filter(entry -> entry.getValue().getManufacturername().contains("IKEA"))
                     .map(light -> new Light(light.getKey(), light.getValue()))
-                    .collect(toResources());
+                    .collect(Resources.toResources());
 
             log.info("Discovered TRÅDFRI lights: {}", tradfriLights);
 
@@ -88,9 +86,9 @@ public class HueTradfriFixer {
                     .getGroups()
                     .entrySet()
                     .stream()
-                    .filter(entry -> !disjoint(entry.getValue().getLights(), tradfriLights.ids()))
+                    .filter(entry -> tradfriLights.containsAny(entry.getValue().getLights()))
                     .map(group -> new Group(group.getKey(), group.getValue()))
-                    .collect(toResources());
+                    .collect(Resources.toResources());
 
             log.info("Groups containing TRÅDFRI lights: {}", tradfriGroups);
 
@@ -100,7 +98,7 @@ public class HueTradfriFixer {
                     .stream()
                     .filter(entry -> tradfriGroups.contains(entry.getValue().getGroup()))
                     .map(scene -> new Scene(scene.getKey(), tradfriGroups.get(scene.getValue().getGroup()).getName(), scene.getValue()))
-                    .collect(toResources());
+                    .collect(Resources.toResources());
 
             log.info("Scenes containing TRÅDFRI lights: {}", tradfriScenes);
 

@@ -1,4 +1,4 @@
-package sacnoth.network;
+package de.sacnoth.network;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

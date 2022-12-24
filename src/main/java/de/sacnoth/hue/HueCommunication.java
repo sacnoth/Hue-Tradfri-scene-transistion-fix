@@ -1,14 +1,12 @@
-package sacnoth.hue;
+package de.sacnoth.hue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import de.sacnoth.network.JSONCommunication;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import sacnoth.network.JSONCommunication;
 
 import java.io.IOException;
-
-import static sacnoth.hue.Resources.toResources;
 
 @AllArgsConstructor
 @Log4j2
@@ -20,7 +18,7 @@ public class HueCommunication {
     public void fixScene(Scene scene, Resources<Light> tradfriLights) throws IOException {
         Resources<Light> lightsToFix = tradfriLights.stream()
                 .filter(light -> scene.getLights().contains(light.id()))
-                .collect(toResources());
+                .collect(Resources.toResources());
 
         log.info("Fixing lights {} in scene {}", lightsToFix, scene);
         JsonNode lightstates = JSONCommunication.get(getUrl("scenes/" + scene.id()))
